@@ -1,0 +1,47 @@
+[1mdiff --git a/a.exe b/a.exe[m
+[1mindex 9de5ea0..bc96f69 100644[m
+Binary files a/a.exe and b/a.exe differ
+[1mdiff --git a/exercicio29.c b/exercicio29.c[m
+[1mindex 65c4fd6..2284683 100644[m
+[1m--- a/exercicio29.c[m
+[1m+++ b/exercicio29.c[m
+[36m@@ -64,6 +64,7 @@[m [mint main(){[m
+                 check(name, name2);[m
+                 int exist = check(name, name2);[m
+ [m
+[32m+[m[41m                [m
+                 if(exist == 1){[m
+                     name = removes(name, name2);[m
+                     printf("\nNome removido.\n");[m
+[36m@@ -162,26 +163,26 @@[m [mchar *removes(char *pName, char *del){      // Remove o nome pedido[m
+     temp[0] = '\0';[m
+ [m
+     strcpy(mirror, pName);[m
+[31m-    coin = strtok(mirror, "\n");[m
+[32m+[m[32m    coin = strtok(mirror, "\n, \0");[m
+ [m
+     while(coin != NULL){[m
+         if(strcmp(del, coin) == 0) break;[m
+ [m
+[31m-        coin = strtok(NULL, "\n");[m
+[32m+[m[32m        coin = strtok(NULL, "\n, \0");[m
+         position++;[m
+     }[m
+ [m
+     strcpy(mirror2, pName);[m
+[31m-    coin = strtok(mirror2, "\n");[m
+[32m+[m[32m    coin = strtok(mirror2, "\n, \0");[m
+ [m
+     while(coin != NULL){[m
+[31m-        if(position == k) coin = strtok(NULL, "\n");[m
+[32m+[m[32m        if(position == k) coin = strtok(NULL, "\n, \0");[m
+         if(coin == NULL) break;[m
+ [m
+         strcat(temp, coin);[m
+         strcat(temp, "\n");[m
+ [m
+[31m-        coin = strtok(NULL, "\n");[m
+[32m+[m[32m        coin = strtok(NULL, "\n, \0");[m
+         k++;[m
+     }[m
+ [m
