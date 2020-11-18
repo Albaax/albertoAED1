@@ -17,7 +17,6 @@ typedef struct node {
 typedef struct list {
     int size;
     Node *head;
-    Node *pLast;
 }List;
 
 typedef struct control {
@@ -30,6 +29,7 @@ typedef struct control {
 
 List *Create_List();
 List *Search_By_Name(List *list, Control *pControl);
+Node *Create_Queue(List *list);
 Control *Create_Control(void *pBuffer);
 
 int Insert_Person(List *list, Data data);
@@ -37,14 +37,20 @@ void Clear_List(List *list);
 void Print_List(List *list);
 void Remove_Last_Person(List *list);
 void Remove_byName(List *list, Control *pControl);
-void Sort_Queue_Bubblesort(List *list, Control *pControl);
+void Push_Print_Queue(List *list, Control *pControl);
 
 int main(){
 
     void *pBuffer = (void*) malloc(sizeof(Control));
+
+    if(pBuffer == NULL){
+        printf("\nERROR: Allocation failed!");
+        return 0;
+    }
+
     Control *pControl = Create_Control(pBuffer);                        // Struct Control crated
     List *listMain = Create_List();                                     // Struct List created
-    pControl->pList = listMain;                                         
+    pControl->pList = listMain;                                         // Just to guard the reference
     Data data;
 
     do{
@@ -55,7 +61,7 @@ int main(){
                "\n(3) - Remove last Person added"
                "\n(4) - Search a Person by name"
                "\n(5) - List People"
-               "\n(6) - Sort with bubblesort and print"
+               "\n(6) - List a priority(alphabetically) queue"
                "\n(0) - Clear and Exit");
 
         printf("\n\nChoose an option: ");
@@ -65,6 +71,7 @@ int main(){
             
             case 1:
 
+                listMain->size++;
                 printf("\n-----Person Data----");                                       // Receive data from user
                 printf("\n--Name: ");
                 scanf(" %[^\n]s", data.name);
@@ -79,7 +86,6 @@ int main(){
             
             case 2:
 
-                listMain->size++;
                 if(listMain->head == NULL){
                     printf("\nThe list is empty!");
                     break;
@@ -116,7 +122,7 @@ int main(){
             
             case 6:
 
-                Sort_Queue_Bubblesort(listMain, pControl);
+                Push_Print_Queue(listMain, pControl);
                 break;
 
             case 0:
@@ -146,7 +152,6 @@ List *Create_List(){                                                        // C
     }
     list->size = 0;
     list->head = NULL;
-    list->pLast = NULL;
 
     return list;
 }
@@ -199,12 +204,88 @@ int Insert_Person(List *list, Data data){
     node->data = data;                                                      // Node Data receive data from the user
     node->next = list->head;                                                // Next pointo to Head(If size=1, head=NULL)
     node->previous = NULL;                                                  // Previous point to NULL
-
+    
     if(list->head != NULL)                                                  // If list isn't empty
         list->head->previous = node;                                        // Head previous point to the new node   
     list->head = node;                                                      // Node is the new head
-    
+
     return 1;
+}
+
+void Push_Print_Queue(List *list, Control *pControl){           // Working, but I need optimize
+
+    if(list->size == 0){
+        printf("\nThe list is empty!");
+        return;
+    }
+    List *queueMain = Create_List();
+    Node *tempNode = list->head;
+    Node *last = NULL;
+    Node *aux = NULL;
+    Node *temp = NULL;
+
+    while(queueMain->size < list->size){
+        queueMain->size++;
+        Node *queue = (Node*) malloc(sizeof(Node));
+
+        if(queue == NULL){
+            printf("\nERROR: Allocation failed!");
+            return;
+        }
+
+        if(queueMain->size == 1){
+            queue->data = tempNode->data;
+            queue->next = queueMain->head;
+            queue->previous = NULL;
+            queueMain->head = queue;
+            last = queueMain->head;                                                         // last will get the position of queue
+            aux = queueMain->head;
+        }
+
+        else if (queueMain->size > 1){
+            queue->data = tempNode->data;
+            aux = queueMain->head;
+            while(aux != NULL){
+                if(strcmp(queue->data.name, aux->data.name) == -1 && aux == queueMain->head){   // Beginning
+                    queue->next = queueMain->head;
+                    queue->previous = NULL;
+                    queueMain->head = queue;
+                    break;
+                }
+                else if(strcmp(queue->data.name, aux->data.name) == -1 && aux != queueMain->head){  // Middle
+                    queue->next = temp->next;
+                    temp->next = queue;
+                    break;
+                }
+                temp = aux;
+                aux = aux->next;
+                            
+            }
+            if(aux == NULL){                                                                     // End
+                last->next = queue;
+                queue->next = NULL;
+                last = queue;
+            }
+        }
+
+        tempNode = tempNode->next;
+    }
+    
+    temp = queueMain->head;
+    while(temp != NULL){
+        printf("\nName: %s", temp->data.name);
+        printf("\nAge: %d", temp->data.age);
+        printf("\nPhonenumber: %d", temp->data.phonenumber);
+        printf("\n------------");     
+        temp = temp->next;        
+    }
+
+    free(tempNode);
+    free(temp);
+    free(aux);
+    free(last);
+    Clear_List(queueMain);
+
 }
 
 void Clear_List(List *list){                                                // Free node by node
@@ -287,39 +368,6 @@ void Remove_byName(List *list, Control *pControl){
     printf("\n%s was removed!", tempNode->data.name);
     free(tempNode);
 }
-
-
-void Sort_Queue_Bubblesort(List *list, Control *pControl){                              // ERROR: Funcion is not working as should be
-
-    if(list->head == NULL){
-        printf("\nThe list is empty!");
-        return;
-    }
-
-    if(list->size == 1){
-        printf("\nThe list is already sorted!");
-        return;
-    }
-    Node *tempNode = list->head;
-    Node *aux = NULL;
-
-    for(pControl->k = 0; pControl->k < list->size - 1; (pControl->k)++){
-        tempNode = list->head;
-        {
-            if(strcmp(tempNode->data.name, tempNode->next->data.name) > 0){
-                aux = tempNode->next;
-                tempNode = tempNode->next;
-                tempNode->next = aux;
-            }            
-                tempNode = tempNode->next;
-        }
-    }
-
-    Print_List(list);
-    free(tempNode);
-    free(aux);
-}
-
 
 
 
