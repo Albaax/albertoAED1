@@ -270,22 +270,19 @@ void Push_Print_Queue(List *list, Control *pControl){           // Working, but 
 
         tempNode = tempNode->next;
     }
-    
-    temp = queueMain->head;
-    while(temp != NULL){
+
+    while(queueMain->head != NULL){                                     // Pop and print
+        temp = queueMain->head;
         printf("\nName: %s", temp->data.name);
         printf("\nAge: %d", temp->data.age);
         printf("\nPhonenumber: %d", temp->data.phonenumber);
         printf("\n------------");     
-        temp = temp->next;        
+        queueMain->head = temp->next;
+        queueMain->size--;   
+        free(temp);     
     }
 
-    free(tempNode);
-    free(temp);
-    free(aux);
-    free(last);
-    Clear_List(queueMain);
-
+    free(queueMain);
 }
 
 void Clear_List(List *list){                                                // Free node by node
@@ -368,7 +365,6 @@ void Remove_byName(List *list, Control *pControl){
     printf("\n%s was removed!", tempNode->data.name);
     free(tempNode);
 }
-
 
 
 
